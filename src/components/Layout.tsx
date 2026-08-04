@@ -9,18 +9,25 @@ export default function Layout({
   onOpenCreate
 }: {
   children: React.ReactNode,
-  onNavigate: (view: 'home' | 'profile', userId?: string) => void,
+  onNavigate: (view: 'home' | 'profile' | 'dm', userId?: string) => void,
   currentView: string,
   onOpenCreate: () => void
 }) {
-  const { currentUser } = useAppContext();
+  const { currentUser, chats } = useAppContext();
+  
+  const hasUnread = chats.some(c => c.unreadCount > 0);
 
-  const NavItem = ({ icon: Icon, label, isActive, onClick, className = '' }: any) => (
+  const NavItem = ({ icon: Icon, label, isActive, onClick, className = '', hasBadge = false }: any) => (
     <button
       onClick={onClick}
-      className={`flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100 transition-colors w-full group ${isActive ? 'font-bold' : ''} ${className}`}
+      className={`flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100 transition-colors w-full group relative ${isActive ? 'font-bold' : ''} ${className}`}
     >
-      <Icon className={`w-6 h-6 group-hover:scale-105 transition-transform ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+      <div className="relative">
+        <Icon className={`w-6 h-6 group-hover:scale-105 transition-transform ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+        {hasBadge && (
+          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+        )}
+      </div>
       <span className="hidden xl:block text-base">{label}</span>
     </button>
   );
@@ -39,7 +46,7 @@ export default function Layout({
           <NavItem icon={Search} label="검색" />
           <NavItem icon={Compass} label="탐색" />
           <NavItem icon={Film} label="릴스" />
-          
+          <NavItem icon={MessageCircle} label="메시지" isActive={currentView === 'dm'} onClick={() => onNavigate('dm')} hasBadge={hasUnread} />
           <NavItem icon={Heart} label="알림" />
           <NavItem icon={PlusSquare} label="만들기" onClick={onOpenCreate} />
           
@@ -66,6 +73,12 @@ export default function Layout({
           <div className="font-serif text-xl font-bold tracking-tight cursor-pointer" onClick={() => onNavigate('home')}>Gram</div>
           <div className="flex items-center gap-4">
             <Heart className="w-6 h-6" />
+            <div className="relative cursor-pointer" onClick={() => onNavigate('dm')}>
+              <MessageCircle className="w-6 h-6" />
+              {hasUnread && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -83,8 +96,11 @@ export default function Layout({
         <button onClick={onOpenCreate} className="p-2 transition-transform active:scale-95">
           <PlusSquare className="w-6 h-6" />
         </button>
-        <button className="p-2 transition-transform active:scale-95">
-          <Film className="w-6 h-6" />
+        <button className="p-2 transition-transform active:scale-95 relative" onClick={() => onNavigate('dm')}>
+          <MessageCircle className={`w-6 h-6 ${currentView === 'dm' ? 'stroke-[2.5]' : ''}`} />
+          {hasUnread && (
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></div>
+          )}
         </button>
         <button onClick={() => onNavigate('profile', currentUser.id)} className="p-2 transition-transform active:scale-95">
           <img referrerPolicy="no-referrer"

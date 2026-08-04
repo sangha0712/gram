@@ -1,4 +1,4 @@
-import { User, Post } from './types';
+import { User, Post, Comment } from './types';
 
 export const CURRENT_USER_ID = 'user_1';
 
@@ -266,9 +266,9 @@ export const INITIAL_POSTS: Post[] = [
     overlayText: '센스있는 코디엔\n체크셔츠가 진리..♡',
     overlaySubText: '1+1 특가 진행중인데 안 사면 바보',
     likes: Array.from({length: 65}).map((_, i) => `user_${i+1}`),
-    timestamp: Date.now() - 3600000 * 4,
+    timestamp: Date.now() - 3600000 * 24 * 7,
     comments: [
-      { id: 'c_sin_1', userId: 'user_6', text: '커플룩으로 딱이네요 ㅎㅎ', timestamp: Date.now() - 3500000 * 4, likes: [] },
+      { id: 'c_sin_1', userId: 'user_6', text: '커플룩으로 딱이네요 ㅎㅎ', timestamp: Date.now() - 3500000 * 24 * 7, likes: [] },
     ]
   },
   {

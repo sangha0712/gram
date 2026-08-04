@@ -22,7 +22,7 @@ const OptionsModal = ({ onClose, onAction }: { onClose: () => void, onAction: (a
   );
 };
 
-export default function PostCard({ post, onUserClick }: { post: Post, onUserClick: (userId: string) => void }) {
+const PostCard: React.FC<{ post: Post, onUserClick: (userId: string) => void }> = ({ post, onUserClick }) => {
   const { getUser, currentUser, toggleLike } = useAppContext();
   const author = getUser(post.userId);
   const isLiked = post.likes.includes(currentUser.id);
@@ -297,4 +297,6 @@ export default function PostCard({ post, onUserClick }: { post: Post, onUserClic
       )}
     </div>
   );
-}
+};
+
+export default PostCard;

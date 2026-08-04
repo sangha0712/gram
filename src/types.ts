@@ -31,3 +31,17 @@ export interface Post {
   overlaySubText?: string;
   overlayTags?: string[];
 }
+
+export interface Message {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: number;
+  read?: boolean;
+}
+
+export interface Chat {
+  userId: string;
+  messages: Message[];
+  unreadCount: number;
+}
