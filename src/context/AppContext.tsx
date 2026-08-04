@@ -17,6 +17,10 @@ interface AppContextType {
   markChatAsRead: (userId: string) => void;
   triggerDisasterDMs: () => void;
   updateCurrentUser: (username: string, fullName: string) => void;
+  phoneState: 'on' | 'warning' | 'shutting_down' | 'off' | 'booting';
+  setPhoneState: React.Dispatch<React.SetStateAction<'on' | 'warning' | 'shutting_down' | 'off' | 'booting'>>;
+  triggerShutdown: () => void;
+  turnOnPhone: () => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -26,6 +30,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [phoneState, setPhoneState] = useState<'on' | 'warning' | 'shutting_down' | 'off' | 'booting'>('on');
 
   useEffect(() => {
     const storedUsers = localStorage.getItem('insta_users_v17');
@@ -235,6 +240,20 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const triggerShutdown = () => {
+    setPhoneState('shutting_down');
+    setTimeout(() => {
+      setPhoneState('off');
+    }, 5000);
+  };
+
+  const turnOnPhone = () => {
+    setPhoneState('booting');
+    setTimeout(() => {
+      setPhoneState('on');
+    }, 6000);
+  };
+
   const triggerDisasterDMs = () => {
     // Staggered incoming DMs from existing contacts when disaster alert sounds
     // Phase 1: Normal safety checks -> Phase 2: Corrupted/attacked messages
@@ -283,6 +302,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }, delay);
     });
+
+    // Trigger phone overheating warning 1 minute after disaster alert sounds
+    setTimeout(() => {
+      setPhoneState('warning');
+    }, 60000);
   };
 
   const updateCurrentUser = (username: string, fullName: string) => {
@@ -292,7 +316,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ users, posts, currentUser, chats, addPost, toggleLike, toggleCommentLike, addComment, toggleFollow, getUser, sendMessage, markChatAsRead, triggerDisasterDMs, updateCurrentUser }}>
+    <AppContext.Provider value={{ users, posts, currentUser, chats, addPost, toggleLike, toggleCommentLike, addComment, toggleFollow, getUser, sendMessage, markChatAsRead, triggerDisasterDMs, updateCurrentUser, phoneState, setPhoneState, triggerShutdown, turnOnPhone }}>
       {children}
     </AppContext.Provider>
   );

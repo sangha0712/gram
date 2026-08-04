@@ -6,6 +6,7 @@ import Profile from './components/Profile';
 import CreatePostModal from './components/CreatePostModal';
 import DirectMessages from './components/DirectMessages';
 import InitialSetup from './components/InitialSetup';
+import PhoneSimulationOverlay from './components/PhoneSimulationOverlay';
 
 function AppContent() {
   const [view, setView] = useState<'home' | 'profile' | 'dm'>('home');
@@ -40,6 +41,7 @@ function AppContent() {
         {isCreateOpen && <CreatePostModal onClose={() => setIsCreateOpen(false)} />}
       </Layout>
       {!hasCompletedSetup && <InitialSetup onComplete={handleSetupComplete} />}
+      <PhoneSimulationOverlay />
     </>
   );
 }

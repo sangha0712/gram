@@ -12,15 +12,20 @@ export default function Feed({ onUserClick }: { onUserClick: (userId: string) =>
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showAlarm, setShowAlarm] = useState(false);
   const [errorTriggeredAt, setErrorTriggeredAt] = useState<number | null>(null);
+  const [hasTriggeredAlarm, setHasTriggeredAlarm] = useState(() => {
+    return localStorage.getItem('gram_disaster_triggered') === 'true';
+  });
   const alarmTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    if (loadingState === 'error' && !errorTriggeredAt) {
+    if (loadingState === 'error' && !errorTriggeredAt && !hasTriggeredAlarm) {
       setErrorTriggeredAt(Date.now());
+      setHasTriggeredAlarm(true);
+      localStorage.setItem('gram_disaster_triggered', 'true');
     }
-  }, [loadingState, errorTriggeredAt]);
+  }, [loadingState, errorTriggeredAt, hasTriggeredAlarm]);
 
   useEffect(() => {
     if (errorTriggeredAt) {
