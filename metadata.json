@@ -1,0 +1,6 @@
+{
+  "name": "Gram",
+  "description": "A photo and video sharing social network similar to Instagram.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
