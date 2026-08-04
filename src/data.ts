@@ -1,4 +1,4 @@
-import { User, Post, Comment } from './types';
+import { User, Post, Comment, Chat } from './types';
 
 export const CURRENT_USER_ID = 'user_1';
 
@@ -391,5 +391,52 @@ export const INITIAL_POSTS: Post[] = [
     caption: 'Late night coding session. 💻☕ Powered by espresso and good lo-fi beats.',
     likes: ['user_2', 'user_3'],
     timestamp: Date.now() - 3600000 * 24, // 1 day ago
+  }
+];
+
+export const INITIAL_CHATS: Chat[] = [
+  {
+    userId: 'user_3',
+    unreadCount: 0,
+    messages: [
+      { id: 'm2_1', senderId: 'user_3', text: '야 아까 피드에 올린 키보드 뭐냐? 분위기 개지리네 👍', timestamp: Date.now() - 3600000 * 12, read: true },
+      { id: 'm2_2', senderId: 'user_1', text: '노블레오 65에 저소음 바다소금축 직구해서 꽂았지 ㅋㅋㅋ', timestamp: Date.now() - 3600000 * 11.5, read: true },
+      { id: 'm2_3', senderId: 'user_3', text: '헐 타건음 도각도각 소리 지리겠는데? 얼마 주고 샀음?', timestamp: Date.now() - 3600000 * 11.0, read: true },
+      { id: 'm2_4', senderId: 'user_1', text: '알리 할인할 때 사서 7만원 정도? 가성비 진짜 미쳤어 ㅋㅋㅋ', timestamp: Date.now() - 3600000 * 10.5, read: true },
+      { id: 'm2_5', senderId: 'user_3', text: '미쳤다 나도 당장 지른다 ㅋㅋㅋ 구매 링크 좀 쏴봐', timestamp: Date.now() - 3600000 * 10.0, read: true },
+      { id: 'm2_6', senderId: 'user_1', text: '카톡으로 보내둘게 확인해봐 ㅋㅋㅋ 사면 타건음 들려줘라', timestamp: Date.now() - 3600000 * 9.8, read: true }
+    ]
+  },
+  {
+    userId: 'user_joo',
+    unreadCount: 0,
+    messages: [
+      { id: 'm3_1', senderId: 'user_joo', text: '야 오늘 저녁에 롤 ㄱ?', timestamp: Date.now() - 3600000 * 20, read: true },
+      { id: 'm3_2', senderId: 'user_1', text: '나 퇴근하고 밥 먹고 한 9시쯤 가능 ㅋㅋㅋ', timestamp: Date.now() - 3600000 * 19, read: true },
+      { id: 'm3_3', senderId: 'user_joo', text: '오케이 9시에 디코 들어와라 ㅋㅋㅋ 맥주 한잔 때리면서 하자', timestamp: Date.now() - 3600000 * 18, read: true },
+      { id: 'm3_4', senderId: 'user_1', text: '좋지 ㅋㅋㅋ 치킨 하나 시켜놓을게', timestamp: Date.now() - 3600000 * 17, read: true },
+      { id: 'm3_5', senderId: 'user_joo', text: '캬 역시 센스 ㅋㅋㅋ 9시에 본다!', timestamp: Date.now() - 3600000 * 2, read: true }
+    ]
+  },
+  {
+    userId: 'user_4',
+    unreadCount: 0,
+    messages: [
+      { id: 'm4_1', senderId: 'user_4', text: '야 오늘 헬스장 몇시에 올 거임?', timestamp: Date.now() - 3600000 * 30, read: true },
+      { id: 'm4_2', senderId: 'user_1', text: '나 한 7시 반에 도착할 듯! 오늘 등 털 생각이다 🔥', timestamp: Date.now() - 3600000 * 29, read: true },
+      { id: 'm4_3', senderId: 'user_4', text: '굿 ㅋㅋㅋ 나 가슴 찢는 날인데 시간 딱 맞네 같이 쇠질하자', timestamp: Date.now() - 3600000 * 28.5, read: true },
+      { id: 'm4_4', senderId: 'user_1', text: '오케이 7시 반에 헬스장 입구에서 봐! 스트랩 챙겨옴', timestamp: Date.now() - 3600000 * 28, read: true },
+      { id: 'm4_5', senderId: 'user_4', text: '오 베르사 스트랩 빌려줘 ㅋㅋㅋ 오운완 찍자!', timestamp: Date.now() - 3600000 * 27, read: true }
+    ]
+  },
+  {
+    userId: 'user_6',
+    unreadCount: 0,
+    messages: [
+      { id: 'm6_1', senderId: 'user_6', text: '야 우리 집 고양이 뻗어서 자는 꼬라지 좀 봐라 ㅋㅋㅋ (사진)', timestamp: Date.now() - 3600000 * 60, read: true },
+      { id: 'm6_2', senderId: 'user_1', text: 'ㅋㅋㅋㅋ 아 미친 배 다 까뒤집고 자네 졸귀 ㅋㅋㅋㅋ', timestamp: Date.now() - 3600000 * 59, read: true },
+      { id: 'm6_3', senderId: 'user_6', text: '에어컨 틀어줬더니 저러고 기절함 ㅋㅋㅋ 토요일에 놀러와라 치킨 쏠게', timestamp: Date.now() - 3600000 * 58, read: true },
+      { id: 'm6_4', senderId: 'user_1', text: '오 치킨 개꿀 ㅋㅋㅋ 토요일 2시쯤 갈게!', timestamp: Date.now() - 3600000 * 57, read: true }
+    ]
   }
 ];

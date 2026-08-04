@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Post, Chat, Message, Comment } from '../types';
-import { INITIAL_USERS, INITIAL_POSTS, CURRENT_USER_ID } from '../data';
+import { INITIAL_USERS, INITIAL_POSTS, INITIAL_CHATS, CURRENT_USER_ID } from '../data';
 
 interface AppContextType {
   users: User[];
@@ -30,7 +30,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const storedUsers = localStorage.getItem('insta_users_v17');
     const storedPosts = localStorage.getItem('insta_posts_v17');
-    const storedChats = localStorage.getItem('insta_chats_v1');
+    const storedChats = localStorage.getItem('insta_chats_v5');
     
     if (storedUsers) {
       setUsers(JSON.parse(storedUsers));
@@ -46,6 +46,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (storedChats) {
       setChats(JSON.parse(storedChats));
+    } else {
+      setChats(INITIAL_CHATS);
     }
     
     setIsLoaded(true);
@@ -54,7 +56,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('insta_users_v17', JSON.stringify(users));
-      localStorage.setItem('insta_chats_v1', JSON.stringify(chats));
+      localStorage.setItem('insta_chats_v5', JSON.stringify(chats));
       
       // Filter out Object URLs (videos) from being stored in localStorage to prevent errors
       // and keep size manageable for the prototype
@@ -234,44 +236,53 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const triggerDisasterDMs = () => {
-    // 4 seconds after trigger, receive DMs from 3 random friends
-    setTimeout(() => {
-      const randomFriends = users.filter(u => u.id !== currentUser.id).slice(0, 3);
-      if (randomFriends.length === 0) return;
+    // Staggered incoming DMs from existing contacts when disaster alert sounds
+    // Phase 1: Normal safety checks -> Phase 2: Corrupted/attacked messages
+    const disasterMessages = [
+      // Phase 1: Initial panic and safety checks
+      { userId: 'user_4', delay: 2500, text: '야 지금 어디임?? 밖이면 빨리 들어와 문 잠그고!!' },
+      { userId: 'user_3', delay: 4000, text: '미친 에이저 출몰이 뭐냐... 너 집 문이랑 창문 다 잠갔어??' },
+      { userId: 'user_joo', delay: 5500, text: '야 너 무사함?? 연락 좀 줘라 안부 확인되면 ㅠㅠ' },
+      { userId: 'user_6', delay: 7000, text: '창문 밖에서 무슨 이상한 소리 나는데... 헐 잠시만' },
 
-      const messagesText = ["방금 경보 뭐야?", "야 너 괜찮아?", "무슨 일이야?"];
-      
-      setChats(prevChats => {
-        let newChats = [...prevChats];
-        
-        randomFriends.forEach((friend, idx) => {
-          const chatIndex = newChats.findIndex(c => c.userId === friend.id);
+      // Phase 2: Attacked / corrupted messages (glitch & scream)
+      { userId: 'user_4', delay: 9500, text: '야 문 두드ㄹㅕㄴㄷㅏ ㅂㅈㄷㅁㄴㅇㄻㄴㅇ#$%' },
+      { userId: 'user_6', delay: 11500, text: 'ㄴㅜㄴ을ㅁㅏㅈㅊㅜㅈㅣㅁㅏ@#$%^&*ㅇㅗㅁㄴㅜ#' }
+    ];
+
+    disasterMessages.forEach(({ userId, delay, text }, index) => {
+      setTimeout(() => {
+        setChats(prevChats => {
+          const chatIndex = prevChats.findIndex(c => c.userId === userId);
           const newMessage: Message = {
-            id: `msg_${Date.now()}_${idx}`,
-            senderId: friend.id,
-            text: messagesText[idx % messagesText.length],
+            id: `disaster_msg_${Date.now()}_${index}`,
+            senderId: userId,
+            text: text,
             timestamp: Date.now(),
             read: false
           };
-          
+
           if (chatIndex !== -1) {
-            newChats[chatIndex] = {
-              ...newChats[chatIndex],
-              messages: [...newChats[chatIndex].messages, newMessage],
-              unreadCount: newChats[chatIndex].unreadCount + 1
+            const updated = [...prevChats];
+            updated[chatIndex] = {
+              ...updated[chatIndex],
+              messages: [...updated[chatIndex].messages, newMessage],
+              unreadCount: updated[chatIndex].unreadCount + 1
             };
+            return updated;
           } else {
-            newChats.push({
-              userId: friend.id,
-              messages: [newMessage],
-              unreadCount: 1
-            });
+            return [
+              ...prevChats,
+              {
+                userId: userId,
+                messages: [newMessage],
+                unreadCount: 1
+              }
+            ];
           }
         });
-        
-        return newChats;
-      });
-    }, 4000);
+      }, delay);
+    });
   };
 
   const updateCurrentUser = (username: string, fullName: string) => {
