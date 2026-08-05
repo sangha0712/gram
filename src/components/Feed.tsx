@@ -12,18 +12,20 @@ export default function Feed({ onUserClick }: { onUserClick: (userId: string) =>
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showAlarm, setShowAlarm] = useState(false);
   const [errorTriggeredAt, setErrorTriggeredAt] = useState<number | null>(null);
-  const [hasTriggeredAlarm, setHasTriggeredAlarm] = useState(() => {
-    return localStorage.getItem('gram_disaster_triggered') === 'true';
-  });
+  const [hasTriggeredAlarm, setHasTriggeredAlarm] = useState(false);
   const alarmTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
+    // Clear any existing localStorage flag to make the experience testable/demoable on page refresh
+    localStorage.removeItem('gram_disaster_triggered');
+  }, []);
+
+  useEffect(() => {
     if (loadingState === 'error' && !errorTriggeredAt && !hasTriggeredAlarm) {
       setErrorTriggeredAt(Date.now());
       setHasTriggeredAlarm(true);
-      localStorage.setItem('gram_disaster_triggered', 'true');
     }
   }, [loadingState, errorTriggeredAt, hasTriggeredAlarm]);
 
@@ -196,19 +198,19 @@ export default function Feed({ onUserClick }: { onUserClick: (userId: string) =>
       entries => {
         if (entries[0].isIntersecting) {
           if (showConnectionError) {
-            setLoadingState('loading');
-            if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
-            loadingTimerRef.current = setTimeout(() => {
-              setLoadingState('error');
-            }, 1500);
+            setLoadingState(prev => {
+              if (prev === 'idle') {
+                if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+                loadingTimerRef.current = setTimeout(() => {
+                  setLoadingState('error');
+                }, 1500);
+                return 'loading';
+              }
+              return prev;
+            });
           } else {
             // Append 3 random posts
             setRandomPosts(prev => [...prev, generateRandomPost(), generateRandomPost(), generateRandomPost()]);
-          }
-        } else {
-          if (showConnectionError) {
-            if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
-            setLoadingState('idle');
           }
         }
       },

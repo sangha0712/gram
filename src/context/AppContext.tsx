@@ -2,6 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Post, Chat, Message, Comment } from '../types';
 import { INITIAL_USERS, INITIAL_POSTS, INITIAL_CHATS, CURRENT_USER_ID } from '../data';
 
+export interface AppNotification {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  text: string;
+  timestamp: number;
+}
+
 interface AppContextType {
   users: User[];
   posts: Post[];
@@ -21,6 +30,8 @@ interface AppContextType {
   setPhoneState: React.Dispatch<React.SetStateAction<'on' | 'warning' | 'shutting_down' | 'off' | 'booting'>>;
   triggerShutdown: () => void;
   turnOnPhone: () => void;
+  notifications: AppNotification[];
+  dismissNotification: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -31,6 +42,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [phoneState, setPhoneState] = useState<'on' | 'warning' | 'shutting_down' | 'off' | 'booting'>('on');
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
     const storedUsers = localStorage.getItem('insta_users_v17');
@@ -271,6 +283,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
     disasterMessages.forEach(({ userId, delay, text }, index) => {
       setTimeout(() => {
+        // Look up sender details
+        const sender = users.find(u => u.id === userId) || INITIAL_USERS.find(u => u.id === userId);
+
         setChats(prevChats => {
           const chatIndex = prevChats.findIndex(c => c.userId === userId);
           const newMessage: Message = {
@@ -300,13 +315,33 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
             ];
           }
         });
+
+        // Add to active notifications
+        if (sender) {
+          const notifId = `disaster_notif_${Date.now()}_${index}`;
+          setNotifications(prev => [
+            ...prev,
+            {
+              id: notifId,
+              senderId: userId,
+              senderName: sender.fullName || sender.username,
+              senderAvatar: sender.avatar,
+              text: text,
+              timestamp: Date.now()
+            }
+          ]);
+        }
       }, delay);
     });
 
-    // Trigger phone overheating warning 1 minute after disaster alert sounds
+    // Trigger phone overheating warning 2 minutes after disaster alert sounds
     setTimeout(() => {
       setPhoneState('warning');
-    }, 60000);
+    }, 120000);
+  };
+
+  const dismissNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   const updateCurrentUser = (username: string, fullName: string) => {
@@ -316,7 +351,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ users, posts, currentUser, chats, addPost, toggleLike, toggleCommentLike, addComment, toggleFollow, getUser, sendMessage, markChatAsRead, triggerDisasterDMs, updateCurrentUser, phoneState, setPhoneState, triggerShutdown, turnOnPhone }}>
+    <AppContext.Provider value={{ users, posts, currentUser, chats, addPost, toggleLike, toggleCommentLike, addComment, toggleFollow, getUser, sendMessage, markChatAsRead, triggerDisasterDMs, updateCurrentUser, phoneState, setPhoneState, triggerShutdown, turnOnPhone, notifications, dismissNotification }}>
       {children}
     </AppContext.Provider>
   );

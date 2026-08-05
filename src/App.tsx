@@ -7,22 +7,26 @@ import CreatePostModal from './components/CreatePostModal';
 import DirectMessages from './components/DirectMessages';
 import InitialSetup from './components/InitialSetup';
 import PhoneSimulationOverlay from './components/PhoneSimulationOverlay';
+import NotificationContainer from './components/NotificationContainer';
 
 function AppContent() {
   const [view, setView] = useState<'home' | 'profile' | 'dm'>('home');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [hasCompletedSetup, setHasCompletedSetup] = useState(true);
+  const [hasCompletedSetup, setHasCompletedSetup] = useState(false);
 
   useEffect(() => {
-    const setupStatus = localStorage.getItem('insta_setup_complete');
-    if (!setupStatus) {
+    localStorage.removeItem('insta_setup_complete');
+    const setupStatus = sessionStorage.getItem('insta_setup_complete');
+    if (setupStatus === 'true') {
+      setHasCompletedSetup(true);
+    } else {
       setHasCompletedSetup(false);
     }
   }, []);
 
   const handleSetupComplete = () => {
-    localStorage.setItem('insta_setup_complete', 'true');
+    sessionStorage.setItem('insta_setup_complete', 'true');
     setHasCompletedSetup(true);
   };
 
@@ -41,6 +45,7 @@ function AppContent() {
         {isCreateOpen && <CreatePostModal onClose={() => setIsCreateOpen(false)} />}
       </Layout>
       {!hasCompletedSetup && <InitialSetup onComplete={handleSetupComplete} />}
+      <NotificationContainer />
       <PhoneSimulationOverlay />
     </>
   );
